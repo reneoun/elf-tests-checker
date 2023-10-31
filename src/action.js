@@ -14,7 +14,7 @@ const run = async () => {
   console.log("Pull Request: ", pullRequest);
   console.log(" Octokit: ", octokit);
 
-  await octokit.issues.createComment({
+  await octokit.issues?.createComment({
     ...context.repo,
     issue_number: pullRequest.number,
     body: "Hello World!",
