@@ -37,6 +37,8 @@ const run = async () => {
   }
 
   try {
+    const rmPRComment = await octokit.rest.issues.listComments({});
+
     const newPRComment = await octokit.rest.issues.createComment({
       owner,
       repo,
