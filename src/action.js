@@ -15,12 +15,13 @@ const run = async () => {
   console.log(" Git Diff", core.getInput("CODE_DIFF"));
 
   try {
-    const newIssue = await octokit.rest.issues.create({
-      ...context.repo,
-      title: "New issue!",
-      body: "Hello Universe!",
+    const newPRComment = await octokit.rest.issues.createComment({
+      owner,
+      repo,
+      issue_number: pull_request.number,
+      body: "Hello World!",
     });
-    console.log("New Issue: ", newIssue);
+    console.log("New Issue: ", newPRComment);
   } catch (error) {
     console.log("Error: ", error);
     console.log("number: ", pull_request.number);
@@ -29,4 +30,5 @@ const run = async () => {
 
   console.log("Hello World23!");
 };
+
 run();
