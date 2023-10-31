@@ -14,6 +14,6 @@ const run = async () => {
     body: "Hello World!",
   });
 
-  console.log("Hello World!");
+  console.log("Hello World2!");
 };
 run();
