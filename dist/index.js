@@ -29882,6 +29882,14 @@ module.exports = require("buffer");
 
 /***/ }),
 
+/***/ 2081:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("child_process");
+
+/***/ }),
+
 /***/ 6206:
 /***/ ((module) => {
 
@@ -30126,6 +30134,7 @@ var __webpack_exports__ = {};
 const core = __nccwpck_require__(2186);
 const github = __nccwpck_require__(5438);
 const { context } = __nccwpck_require__(5438);
+const { exec } = __nccwpck_require__(2081);
 const fs = __nccwpck_require__(7147);
 
 const run = async () => {
@@ -30134,10 +30143,23 @@ const run = async () => {
 
   const { owner, repo } = context.repo;
   const { pull_request } = context.payload;
+  const branchName = pull_request.head.ref;
 
   // console.log("Pull Request: ", pull_request);
-  console.log(" Owner: ", owner, " Repo: ", repo);
-  console.log(" Git Diff", core.getInput("CODE_DIFF"));
+  console.log(" Owner: ", owner, " Repo: ", repo, " Branch: ", branchName);
+  console.log(
+    " Git Diff",
+    core.getInput("CODE_DIFF").replace(/'/g, "").split(" ").split("\n")
+  );
+
+  exec("git diff --name-only master", (err, stdout, stderr) => {
+    if (err) {
+      console.log("Error: ", err);
+      return;
+    }
+    console.log("stdout: ", stdout);
+    console.log("stderr: ", stderr);
+  });
 
   try {
     const newPRComment = await octokit.rest.issues.createComment({
@@ -30146,11 +30168,8 @@ const run = async () => {
       issue_number: pull_request.number,
       body: "Hello World!",
     });
-    console.log("New Issue: ", newPRComment);
   } catch (error) {
     console.log("Error: ", error);
-    console.log("number: ", pull_request.number);
-    console.log("issue_number: ", pull_request.issue_number);
   }
 
   console.log("Hello World23!");
