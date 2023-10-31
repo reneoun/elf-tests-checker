@@ -4,6 +4,24 @@ const { context } = require("@actions/github");
 const { exec } = require("child_process");
 const fs = require("fs");
 
+const newLines = async (fileName) => {
+  const gitCMD = exec(` git diff origin/main -- ${fileName}`);
+  return new Promise((resolve, reject) => {
+    gitCMD.stdout.on("data", (data) => {
+      if (data.trim() === "") resolve([]);
+      resolve(
+        data
+          .split("\n")
+          .filter(
+            (newCode) =>
+              newCode.trim().startsWith("+") &&
+              !newCode.trim().startsWith("+++")
+          )
+      );
+    });
+  });
+};
+
 const run = async () => {
   const githubToken = core.getInput("GITHUB_TOKEN");
   const octokit = github.getOctokit(githubToken);
@@ -23,14 +41,8 @@ const run = async () => {
     resultInComment += `## ${changedFile} \n`;
 
     try {
-      const gitCMDModifiedLines = exec(
-        `git diff origin/${github.base_ref}..${github.sha}`
-      );
-      let modifiedLines = [];
-      gitCMDModifiedLines.stdout.on("data", (data) => {
-        modifiedLines = data.split("\n");
-      });
-      console.log("Modified Lines: ", modifiedLines);
+      let lines = await newLines(changedFile);
+      console.log("Lines: ", lines);
     } catch (error) {
       console.log("Error in " + changedFile + ": ", error);
     }
