@@ -10,30 +10,17 @@ const run = async () => {
   const { owner, repo } = context.repo;
   const { pull_request } = context.payload;
 
-  console.log("Pull Request: ", pull_request);
+  // console.log("Pull Request: ", pull_request);
   console.log(" Owner: ", owner, " Repo: ", repo);
   console.log(" Git Diff", core.getInput("CODE_DIFF"));
 
   try {
-    await octokit.request(
-      `POST /repos/${owner}/${repo}/issues/${pull_request.number}/comments`,
-      {
-        owner: owner,
-        repo: repo,
-        issue_number: pull_request.number,
-        body: "loremo ipsum dolor sit amet 2",
-        headers: {
-          "X-GitHub-Api-Version": "2022-11-28",
-        },
-      }
-    );
-
-    await octokit.rest.issues.create({
-      owner: owner,
-      repo: repo,
-      title: "Hello, world!",
-      body: "I created this issue using Octokit!",
+    const newIssue = await octokit.rest.issues.create({
+      ...context.repo,
+      title: "New issue!",
+      body: "Hello Universe!",
     });
+    console.log("New Issue: ", newIssue);
   } catch (error) {
     console.log("Error: ", error);
     console.log("number: ", pull_request.number);
