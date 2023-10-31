@@ -30125,6 +30125,7 @@ var __webpack_exports__ = {};
 (() => {
 const core = __nccwpck_require__(2186);
 const github = __nccwpck_require__(5438);
+const { context } = __nccwpck_require__(5438);
 
 const run = async () => {
   const githubToken = core.getInput("GITHUB_TOKEN");
@@ -30132,9 +30133,8 @@ const run = async () => {
 
   const octokit = github.getOctokit(githubToken);
 
-  const { context = {} } = github;
   const { pull_request } = context.payload;
-  console.log("Pull Request: ", pull_request, pull_request.body);
+  console.log("Pull Request: ", pull_request, pull_request?.body);
 
   await octokit.rest.issues?.createComment({
     ...context.repo,
