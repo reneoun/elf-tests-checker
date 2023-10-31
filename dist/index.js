@@ -30133,18 +30133,20 @@ const run = async () => {
 
   const { owner, repo } = context.repo;
   const { pull_request } = context.payload;
+
   console.log("Pull Request: ", pull_request);
   console.log(" Owner: ", owner, " Repo: ", repo);
+  console.log(" Git Diff", core.getInput("CODE_DIFF"));
 
   try {
     await octokit.rest.issues?.createComment({
       ...context.repo,
-      issue_number: pull_request.number - 1,
+      issue_number: pull_request.number,
       body: "Hello World!",
     });
   } catch (error) {
     console.log("Error: ", error);
-    console.log("number: ", pull_request.number - 1);
+    console.log("number: ", pull_request.number);
     console.log("issue_number: ", pull_request.issue_number);
   }
 
