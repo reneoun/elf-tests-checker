@@ -30131,7 +30131,7 @@ const run = async () => {
   const githubToken = core.getInput("GITHUB_TOKEN");
   const octokit = github.getOctokit(githubToken);
 
-  const { owner, repo } = context;
+  const { owner, repo } = context.repo;
   const { pull_request } = context.payload;
   // console.log("Pull Request: ", pull_request, pull_request?.body);
   console.log("Pull Request: ", pull_request?.issue_number);
