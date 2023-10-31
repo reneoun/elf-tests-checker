@@ -52,13 +52,16 @@ const run = async () => {
   console.log(" Git Diff", changedFiles);
 
   for (const changedFile of relevantChangedFiles) {
-    resultInComment += `#### ${changedFile} \n`;
+    resultInComment += `- *File:* ${changedFile} \n`;
 
     try {
       let lines = await newLines(changedFile);
       let tsCode = lines.join("\n");
       const functions = extractFunctions(tsCode);
-      resultInComment += `- New Functions⚒️: ${functions.length} \n`;
+      resultInComment += `- ${functions.length} New Function(s)⚒️\n`;
+      functions.forEach((func) => {
+        resultInComment += `    - ${func}\n`;
+      });
       console.log(`Functions in ${changedFile}: `, functions);
     } catch (error) {
       console.log("Error in " + changedFile + ": ", error);
