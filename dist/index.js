@@ -30136,11 +30136,17 @@ const run = async () => {
   console.log("Pull Request: ", pull_request?.issue_number);
   console.log(" Owner: ", owner, " Repo: ", repo);
 
-  await octokit.rest.issues?.createComment({
-    ...context.repo,
-    issue_number: pull_request.number,
-    body: "Hello World!",
-  });
+  try {
+    await octokit.rest.issues?.createComment({
+      ...context.repo,
+      issue_number: pull_request.number,
+      body: "Hello World!",
+    });
+  } catch (error) {
+    console.log("Error: ", error);
+    console.log("number: ", pull_request.number);
+    console.log("issue_number: ", pull_request.issue_number);
+  }
 
   console.log("Hello World2!");
 };
