@@ -2,7 +2,7 @@ name: Test Checker
 
 on:
   pull_request:
-    types: [opened]
+    types: [opened, synchronize]
 
 jobs:
   test:
@@ -10,3 +10,5 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
