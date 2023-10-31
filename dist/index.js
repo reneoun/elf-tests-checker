@@ -30138,7 +30138,7 @@ const run = async () => {
 
   await octokit.rest.issues?.createComment({
     ...context.repo,
-    issue_number: pullRequest.number,
+    issue_number: pull_request.number,
     body: "Hello World!",
   });
 
