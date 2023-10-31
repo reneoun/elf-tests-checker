@@ -30137,6 +30137,19 @@ const { context } = __nccwpck_require__(5438);
 const { exec } = __nccwpck_require__(2081);
 const fs = __nccwpck_require__(7147);
 
+function extractFunctions(tsCode) {
+  const functionRegex =
+    /(public|private|protected)?\s+(static)?\s*(\w+)\s*\([^]*?\)\s*:?[^]*?{/g;
+  const functions = [];
+  let match;
+
+  while ((match = functionRegex.exec(tsCode)) !== null) {
+    functions.push(match[0]);
+  }
+
+  return functions;
+}
+
 const newLines = async (fileName) => {
   const gitCMD = exec(` git diff origin/main -- ${fileName}`);
   return new Promise((resolve, reject) => {
@@ -30150,6 +30163,7 @@ const newLines = async (fileName) => {
               newCode.trim().startsWith("+") &&
               !newCode.trim().startsWith("+++")
           )
+          .map((line) => line.replace("+", ""))
       );
     });
   });
@@ -30161,27 +30175,31 @@ const run = async () => {
 
   const { owner, repo } = context.repo;
   const { pull_request } = context.payload;
-  const branchName = pull_request.head.ref;
 
   let resultInComment = "";
 
-  // console.log("Pull Request: ", pull_request);
-  // console.log(" Owner: ", owner, " Repo: ", repo, " Branch: ", branchName);
   const changedFiles = core.getInput("CODE_DIFF").replace(/'/g, "").split(" ");
+  const relevantChangedFiles = changedFiles.filter(
+    (file) => file.endsWith(".js") || file.endsWith(".ts")
+  );
   console.log(" Git Diff", changedFiles);
 
-  for (const changedFile of changedFiles) {
-    resultInComment += `## ${changedFile} \n`;
+  for (const changedFile of relevantChangedFiles) {
+    resultInComment += `#### ${changedFile} \n`;
 
     try {
       let lines = await newLines(changedFile);
-      console.log("Lines: ", lines);
+      let tsCode = lines.join("\n");
+      const functions = extractFunctions(tsCode);
+      resultInComment += `- New Functions⚒️: ${functions.length} \n`;
+      console.log(`Functions in ${changedFile}: `, functions);
     } catch (error) {
       console.log("Error in " + changedFile + ": ", error);
     }
   }
 
   try {
+    //TODO: Add a check to see if the comment already exists
     const newPRComment = await octokit.rest.issues.createComment({
       owner,
       repo,
@@ -30191,8 +30209,6 @@ const run = async () => {
   } catch (error) {
     console.log("Error: ", error);
   }
-
-  console.log("Hello World23!");
 };
 
 run();
