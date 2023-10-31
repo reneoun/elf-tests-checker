@@ -16,7 +16,7 @@ const run = async () => {
   console.log(" Owner: ", owner, " Repo: ", repo, " Branch: ", branchName);
   console.log(
     " Git Diff",
-    core.getInput("CODE_DIFF").replace(/'/g, "").split(" ").split("\n")
+    core.getInput("CODE_DIFF").replace(/'/g, "").split(" ")
   );
 
   exec("git diff --name-only master", (err, stdout, stderr) => {
