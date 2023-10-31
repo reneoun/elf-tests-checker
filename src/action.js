@@ -14,6 +14,19 @@ const run = async () => {
   console.log(" Git Diff", core.getInput("CODE_DIFF"));
 
   try {
+    await octokit.request(
+      `POST /repos/${owner}/${repo}/issues/${pull_request.number}/comments`,
+      {
+        owner: "OWNER",
+        repo: "REPO",
+        issue_number: pull_request.number,
+        body: "loremo ipsum dolor sit amet 2",
+        headers: {
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+      }
+    );
+
     await octokit.rest.issues?.createComment({
       ...context.repo,
       issue_number: pull_request.number,
