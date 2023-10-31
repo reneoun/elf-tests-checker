@@ -24,7 +24,7 @@ const run = async () => {
 
     try {
       const gitCMDModifiedLines = exec(
-        `git diff origin/main -- ${changedFile}`
+        `git diff origin/${github.base_ref}..${github.sha}`
       );
       let modifiedLines = [];
       gitCMDModifiedLines.stdout.on("data", (data) => {
@@ -37,8 +37,6 @@ const run = async () => {
   }
 
   try {
-    const rmPRComment = await octokit.rest.issues.listComments({});
-
     const newPRComment = await octokit.rest.issues.createComment({
       owner,
       repo,
