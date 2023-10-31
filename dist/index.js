@@ -30145,28 +30145,36 @@ const run = async () => {
   const { pull_request } = context.payload;
   const branchName = pull_request.head.ref;
 
-  // console.log("Pull Request: ", pull_request);
-  console.log(" Owner: ", owner, " Repo: ", repo, " Branch: ", branchName);
-  console.log(
-    " Git Diff",
-    core.getInput("CODE_DIFF").replace(/'/g, "").split(" ")
-  );
+  let resultInComment = "";
 
-  exec("git diff --name-only master", (err, stdout, stderr) => {
-    if (err) {
-      console.log("Error: ", err);
-      return;
+  // console.log("Pull Request: ", pull_request);
+  // console.log(" Owner: ", owner, " Repo: ", repo, " Branch: ", branchName);
+  const changedFiles = core.getInput("CODE_DIFF").replace(/'/g, "").split(" ");
+  console.log(" Git Diff", changedFiles);
+
+  for (const changedFile of changedFiles) {
+    resultInComment += `## ${changedFile} \n`;
+
+    try {
+      const gitCMDModifiedLines = exec(
+        `git diff origin/main -- ${changedFile}`
+      );
+      let modifiedLines = [];
+      gitCMDModifiedLines.stdout.on("data", (data) => {
+        modifiedLines = data.split("\n");
+      });
+      console.log("Modified Lines: ", modifiedLines);
+    } catch (error) {
+      console.log("Error in " + changedFile + ": ", error);
     }
-    console.log("stdout: ", stdout);
-    console.log("stderr: ", stderr);
-  });
+  }
 
   try {
     const newPRComment = await octokit.rest.issues.createComment({
       owner,
       repo,
       issue_number: pull_request.number,
-      body: "Hello World!",
+      body: resultInComment,
     });
   } catch (error) {
     console.log("Error: ", error);
