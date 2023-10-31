@@ -30133,22 +30133,8 @@ const run = async () => {
 
   const { owner, repo } = context.repo;
   const { pull_request } = context.payload;
-  // console.log("Pull Request: ", pull_request, pull_request?.body);
   console.log("Pull Request: ", pull_request?.issue_number);
   console.log(" Owner: ", owner, " Repo: ", repo);
-
-  await octokit.request(
-    `POST /repos/${owner}/${repo}/issues/${pull_request.issue_number}/comments`,
-    {
-      owner: owner,
-      repo: repo,
-      issue_number: pull_request.issue_number,
-      body: "Me too",
-      headers: {
-        "X-GitHub-Api-Version": "2022-11-28",
-      },
-    }
-  );
 
   await octokit.rest.issues?.createComment({
     ...context.repo,
