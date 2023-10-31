@@ -1,6 +1,7 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
 const { context } = require("@actions/github");
+const fs = require("fs");
 
 const run = async () => {
   const githubToken = core.getInput("GITHUB_TOKEN");
@@ -17,8 +18,8 @@ const run = async () => {
     await octokit.request(
       `POST /repos/${owner}/${repo}/issues/${pull_request.number}/comments`,
       {
-        owner: "OWNER",
-        repo: "REPO",
+        owner: owner,
+        repo: repo,
         issue_number: pull_request.number,
         body: "loremo ipsum dolor sit amet 2",
         headers: {
@@ -27,10 +28,11 @@ const run = async () => {
       }
     );
 
-    await octokit.rest.issues?.createComment({
-      ...context.repo,
-      issue_number: pull_request.number,
-      body: "Hello World!",
+    await octokit.rest.issues.create({
+      owner: owner,
+      repo: repo,
+      title: "Hello, world!",
+      body: "I created this issue using Octokit!",
     });
   } catch (error) {
     console.log("Error: ", error);
@@ -38,6 +40,6 @@ const run = async () => {
     console.log("issue_number: ", pull_request.issue_number);
   }
 
-  console.log("Hello World2!");
+  console.log("Hello World23!");
 };
 run();
