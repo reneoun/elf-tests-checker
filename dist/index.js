@@ -30161,6 +30161,10 @@ function extractFunctions(tsCode) {
   return functions;
 }
 
+const getFunctionName = (func) => {
+  return func.replace(/function\s+|(\s*\{)|\s+/g, "");
+};
+
 const newLines = async (fileName) => {
   const gitCMD = exec(` git diff origin/main -- ${fileName}`);
   return new Promise((resolve, reject) => {
@@ -30190,9 +30194,6 @@ const run = async () => {
   let resultInComment = "";
 
   const changedFiles = core.getInput("CODE_DIFF").replace(/'/g, "").split(" ");
-  // const relevantChangedFiles = changedFiles.filter(
-  //   (file) => file.endsWith(".js") || file.endsWith(".ts")
-  // );
   const relevantChangedFiles = new Map();
   changedFiles.forEach((file) => {
     if (
@@ -30202,7 +30203,10 @@ const run = async () => {
       if (relevantChangedFiles.has("normal")) {
         relevantChangedFiles.get("normal").push(file);
       } else relevantChangedFiles.set("normal", [file]);
-    } else {
+    } else if (
+      (file.endsWith(".js") || file.endsWith(".ts")) &&
+      file.includes("spec")
+    ) {
       if (relevantChangedFiles.has("test")) {
         relevantChangedFiles.get("test").push(file);
       } else relevantChangedFiles.set("test", [file]);
@@ -30214,6 +30218,10 @@ const run = async () => {
     // console.log(key, value);
     resultInComment += `### ${key} Files\n`;
     console.log(resultInComment);
+    if (value.length === 0) {
+      resultInComment += `No ${key} files were changed in this pull request\n`;
+      continue;
+    }
     for (const changedFile of value) {
       resultInComment += `- *File:* ${changedFile} \n`;
 
@@ -30221,11 +30229,12 @@ const run = async () => {
         let lines = await newLines(changedFile);
         let tsCode = lines.join("\n");
         const functions = extractFunctions(tsCode);
+        const functionNames = functions.map(getFunctionName);
         resultInComment += `- ${functions.length} New Function(s)⚒️\n`;
         functions.forEach((func) => {
           resultInComment += `    - ${func.replace("\n", "")}\n`;
         });
-        console.log(`Functions in ${changedFile}: `, functions);
+        console.log(`Functions in ${changedFile}: `, functionNames);
       } catch (error) {
         console.log("Error in " + changedFile + ": ", error);
       }
