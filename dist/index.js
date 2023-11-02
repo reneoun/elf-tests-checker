@@ -30199,34 +30199,41 @@ const run = async () => {
       (file.endsWith(".js") || file.endsWith(".ts")) &&
       !file.includes("spec")
     ) {
-      relevantChangedFiles.set("normal", file);
+      if (relevantChangedFiles.has("normal")) {
+        relevantChangedFiles.get("normal").push(file);
+      } else relevantChangedFiles.set("normal", [file]);
     } else {
-      relevantChangedFiles.set("test", file);
+      if (relevantChangedFiles.has("test")) {
+        relevantChangedFiles.get("test").push(file);
+      } else relevantChangedFiles.set("test", [file]);
     }
   });
 
   // console.log(" Git Diff", changedFiles);
+  for (const [key, value] of relevantChangedFiles.entries()) {
+    // console.log(key, value);
+    resultInComment += `### ${key} Files\n`;
+    for (const changedFile of value) {
+      resultInComment += `- *File:* ${changedFile} \n`;
 
-  for (const changedFile of relevantChangedFiles) {
-    resultInComment += `- *File:* ${changedFile} \n`;
-
-    try {
-      let lines = await newLines(changedFile);
-      let tsCode = lines.join("\n");
-      const functions = extractFunctions(tsCode);
-      resultInComment += `- ${functions.length} New Function(s)⚒️\n`;
-      functions.forEach((func) => {
-        resultInComment += `    - ${func.replace("\n", "")}\n`;
-      });
-      console.log(`Functions in ${changedFile}: `, functions);
-    } catch (error) {
-      console.log("Error in " + changedFile + ": ", error);
+      try {
+        let lines = await newLines(changedFile);
+        let tsCode = lines.join("\n");
+        const functions = extractFunctions(tsCode);
+        resultInComment += `- ${functions.length} New Function(s)⚒️\n`;
+        functions.forEach((func) => {
+          resultInComment += `    - ${func.replace("\n", "")}\n`;
+        });
+        console.log(`Functions in ${changedFile}: `, functions);
+      } catch (error) {
+        console.log("Error in " + changedFile + ": ", error);
+      }
     }
   }
 
   try {
     //TODO: Add a check to see if the comment already exists
-    const newPRComment = await octokit.rest.issues.createComment({
+    await octokit.rest.issues.createComment({
       owner,
       repo,
       issue_number: pull_request.number,
