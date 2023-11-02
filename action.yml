@@ -6,6 +6,12 @@ inputs:
   GITHUB_TOKEN:
     description: 'GitHub Token'
     required: true
+  CODE_DIFF:
+    description: 'Code diff'
+    required: false
+  COVERAGE:
+    description: 'Coverage'
+    required: false
 
 runs:
   using: 'node20'
