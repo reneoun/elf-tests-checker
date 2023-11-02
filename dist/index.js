@@ -30136,6 +30136,18 @@ const github = __nccwpck_require__(5438);
 const { context } = __nccwpck_require__(5438);
 const { exec } = __nccwpck_require__(2081);
 
+function test() {
+  console.log("Hello World");
+  return true;
+}
+
+function test2() {
+  if (test()) {
+    console.log("Hello World");
+  }
+  return true;
+}
+
 function extractFunctions(tsCode) {
   const functionRegex =
     /(public|private|protected)?\s+(static)?\s*(\w+)\s*\([^]*?\)\s*:?[^]*?{/g;
@@ -30178,10 +30190,22 @@ const run = async () => {
   let resultInComment = "";
 
   const changedFiles = core.getInput("CODE_DIFF").replace(/'/g, "").split(" ");
-  const relevantChangedFiles = changedFiles.filter(
-    (file) => file.endsWith(".js") || file.endsWith(".ts")
-  );
-  console.log(" Git Diff", changedFiles);
+  // const relevantChangedFiles = changedFiles.filter(
+  //   (file) => file.endsWith(".js") || file.endsWith(".ts")
+  // );
+  const relevantChangedFiles = new Map();
+  changedFiles.forEach((file) => {
+    if (
+      (file.endsWith(".js") || file.endsWith(".ts")) &&
+      !file.includes("spec")
+    ) {
+      relevantChangedFiles.set("normal", file);
+    } else {
+      relevantChangedFiles.set("test", file);
+    }
+  });
+
+  // console.log(" Git Diff", changedFiles);
 
   for (const changedFile of relevantChangedFiles) {
     resultInComment += `- *File:* ${changedFile} \n`;

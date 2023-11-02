@@ -13,7 +13,7 @@ jobs:
           fetch-depth: 0
       - uses: technote-space/get-diff-action@v4
         id: git-diff
-      - uses: reneoun/elf-tests-checker@v1.8.11
+      - uses: reneoun/elf-tests-checker@v1.8.12
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CODE_DIFF: ${{ steps.git-diff.outputs.diff }}
