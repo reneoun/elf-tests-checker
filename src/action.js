@@ -3,6 +3,10 @@ const github = require("@actions/github");
 const { context } = require("@actions/github");
 const { exec } = require("child_process");
 
+function test() {
+  console.log("Hello World");
+}
+
 function extractFunctions(tsCode) {
   const functionRegex =
     /(public|private|protected)?\s+(static)?\s*(\w+)\s*\([^]*?\)\s*:?[^]*?{/g;
