@@ -2,7 +2,6 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const { context } = require("@actions/github");
 const { exec } = require("child_process");
-const fs = require("fs");
 
 function extractFunctions(tsCode) {
   const functionRegex =
@@ -60,7 +59,7 @@ const run = async () => {
       const functions = extractFunctions(tsCode);
       resultInComment += `- ${functions.length} New Function(s)⚒️\n`;
       functions.forEach((func) => {
-        resultInComment += `    - ${func}\n`;
+        resultInComment += `    - ${func.replace("\n", "")}\n`;
       });
       console.log(`Functions in ${changedFile}: `, functions);
     } catch (error) {

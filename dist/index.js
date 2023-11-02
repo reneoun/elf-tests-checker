@@ -30135,7 +30135,6 @@ const core = __nccwpck_require__(2186);
 const github = __nccwpck_require__(5438);
 const { context } = __nccwpck_require__(5438);
 const { exec } = __nccwpck_require__(2081);
-const fs = __nccwpck_require__(7147);
 
 function extractFunctions(tsCode) {
   const functionRegex =
@@ -30193,7 +30192,7 @@ const run = async () => {
       const functions = extractFunctions(tsCode);
       resultInComment += `- ${functions.length} New Function(s)⚒️\n`;
       functions.forEach((func) => {
-        resultInComment += `    - ${func}\n`;
+        resultInComment += `    - ${func.replace("\n", "")}\n`;
       });
       console.log(`Functions in ${changedFile}: `, functions);
     } catch (error) {
