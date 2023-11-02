@@ -30213,6 +30213,7 @@ const run = async () => {
   for (const [key, value] of relevantChangedFiles.entries()) {
     // console.log(key, value);
     resultInComment += `### ${key} Files\n`;
+    console.log(resultInComment);
     for (const changedFile of value) {
       resultInComment += `- *File:* ${changedFile} \n`;
 
