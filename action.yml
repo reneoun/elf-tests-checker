@@ -6,6 +6,12 @@ inputs:
   GITHUB_TOKEN:
     description: 'GitHub Token'
     required: true
+  coverage-main:
+    description: 'Main coverage file'
+    required: false
+  coverage-branch:
+    description: 'Branch coverage file'
+    required: false
 
 runs:
   using: 'node20'
