@@ -122,7 +122,10 @@ const run = async () => {
     let sumTable = createTable(coverageMap);
     console.log("SUMTABLE", sumTable);
 
-    core.summary.addHeading("Coverage Report ☑️📃").addTable(sumTable).write();
+    await core.summary
+      .addHeading("Coverage Report :test_tube:")
+      .addTable(sumTable)
+      .write();
   } catch (error) {
     console.log(`Error[${getEmoji("sad")}]: ${error}`);
   }
