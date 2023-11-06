@@ -37789,7 +37789,7 @@ const createTable = (covMap) => {
         if (!containsHeader(key3)) {
           tableHeader.push({ data: key3, header: true });
         }
-        newRow.push(value3);
+        newRow.push(String(value3));
       }
       tableBody.push(newRow);
     }
