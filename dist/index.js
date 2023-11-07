@@ -37796,7 +37796,7 @@ const createTable = (covMap) => {
   }
 
   table.push(Array.from(new Set(tableHeader)));
-  table.push(tableBody);
+  table.push(...tableBody);
 
   return table;
 };
