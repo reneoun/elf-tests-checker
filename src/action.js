@@ -81,6 +81,48 @@ const createTable = (covMap) => {
   return table;
 };
 
+const calculateDiff = (covMap) => {
+  let totalDiff = {};
+  const mainValues = covMap.get("main");
+  const branchValues = covMap.get("branch");
+  for (const [key, value] of Object.entries(mainValues)) {
+    let tmpDiff = {};
+    for (const [key2, value2] of Object.entries(value)) {
+      tmpDiff[key2] = branchValues[key][key2] - value2;
+    }
+    totalDiff[key] = tmpDiff;
+  }
+  covMap.set("difference", totalDiff);
+};
+
+const createDiffTables = (covMap) => {
+  let tables = [];
+
+  covMap = calculateDiff(covMap);
+
+  //TODO: Add Total
+  const covMapKeys = Array.from(covMap.keys()); //main, branch, difference
+  const objCovKeys = Object.keys(covMap.get(covMapKeys[0])); //statements, branches, functions, lines
+  const objCovKeys2 = Object.keys(covMap.get(covMapKeys[0])[objCovKeys[0]]); //valuePct, covered, total
+
+  for (const covName of objCovKeys) {
+    let tmpHeader = [{ data: covName, header: true }];
+    tmpHeader.push(...objCovKeys2.map((k) => ({ data: k, header: true })));
+    let tmpBody = [];
+    for (const branchName of covMapKeys) {
+      let tmpBodyRow = [];
+      tmpBodyRow.push(branchName);
+      for (const covValue of objCovKeys2) {
+        tmpBodyRow.push(covMap.get(branchName)[covName][covValue]);
+      }
+      tmpBody.push(tmpBodyRow);
+    }
+    tables.push([tmpHeader, ...tmpBody]);
+  }
+  console.log("TABLES", tables);
+  return tables;
+};
+
 const run = async () => {
   const coverageMap = new Map();
   // const githubToken = core.getInput("GITHUB_TOKEN");
@@ -119,12 +161,13 @@ const run = async () => {
     console.log("MAIN", coverageMap.get("main"));
     console.log("BRANCH", coverageMap.get("branch"));
 
-    let sumTable = createTable(coverageMap);
-    console.log("SUMTABLE", sumTable);
+    let sumTable = createDiffTables(coverageMap);
+    // console.log("SUMTABLE", sumTable);
 
     await core.summary
       .addHeading("Coverage Report :test_tube:")
-      .addTable(sumTable)
+      .addTable(sumTable[0])
+      .addTable(sumTable[1])
       .write();
   } catch (error) {
     console.log(`Error[${getEmoji("sad")}]: ${error}`);
