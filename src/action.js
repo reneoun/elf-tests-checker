@@ -101,7 +101,7 @@ const createDiffTables = (covMap) => {
   calculateDiff(covMap);
 
   //TODO: Add Total
-  const covMapKeys = Array.from(); //main, branch, difference
+  const covMapKeys = Array.from(covMap.keys()); //main, branch, difference
   const objCovKeys = Object.keys(covMap.get(covMapKeys[0])); //statements, branches, functions, lines
   const objCovKeys2 = Object.keys(covMap.get(covMapKeys[0])[objCovKeys[0]]); //valuePct, covered, total
 
