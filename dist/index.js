@@ -37848,29 +37848,12 @@ const createDiffTables = (covMap) => {
 
 const run = async () => {
   const coverageMap = new Map();
-  // const githubToken = core.getInput("GITHUB_TOKEN");
-  // const octokit = github.getOctokit(githubToken);
 
   let inputCoverageMain = core.getInput("coverage-main") ?? null;
   let inputCoverageBranch = core.getInput("coverage-branch") ?? null;
 
-  //FOR TESTING
-  // let inputCoverageMain;
-  // inputCoverageMain = await fs.readFile("src/main-test-coverage.html", {
-  //   encoding: "utf8",
-  // });
-
-  // let inputCoverageBranch;
-  // inputCoverageBranch = await fs.readFile("src/pr-test-coverage.html", {
-  //   encoding: "utf8",
-  // });
-
-  console.log("Main", inputCoverageMain);
-  console.log("Branch", inputCoverageBranch);
-
   if (inputCoverageMain === null || inputCoverageBranch === null) {
     core.notice(`No coverage files found. Exiting. ${getEmoji("neutral")}`);
-    // console.log(`No coverage files found. Exiting. ${getEmoji("neutral")}`);
     return 0;
   }
 
@@ -37885,13 +37868,13 @@ const run = async () => {
     console.log("BRANCH", coverageMap.get("branch"));
 
     let sumTable = createDiffTables(coverageMap);
-    // console.log("SUMTABLE", sumTable);
 
-    await core.summary
-      .addHeading("Coverage Report :test_tube:")
-      .addTable(sumTable[0])
-      .addTable(sumTable[1])
-      .write();
+    let summary = core.summary.addHeading("Coverage Report :test_tube:");
+    for (const table of sumTable) {
+      summary.addTable(table);
+      console.log(table);
+    }
+    summary.write();
   } catch (error) {
     console.log(`Error[${getEmoji("sad")}]: ${error}`);
   }
