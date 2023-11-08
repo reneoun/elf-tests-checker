@@ -37727,6 +37727,24 @@ const fs = __nccwpck_require__(3292);
 const sad_emoticons = ["😭", "😢", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣"];
 const neutral_emoticons = ["😐", "😑", "😶", "🙄", "😒", "🤐", "😬"];
 const happy_emoticons = ["😀", "😃", "😄", "😁", "😆", "😊", "😇", "🙂", "🙃"];
+const categoryDetails = new Map([
+  [
+    "Statements",
+    "This metric simply tells you the ratio of statements in an application that are currently under testing (Depending on the programming language, a statement can span multiple lines and a single line could contain multiple statements).",
+  ],
+  [
+    "Branches",
+    "Branch coverage, as we’ve seen, is about whether all branches—or paths of execution—in an application are under test (Conditional statements, such as if and switch statements, create branches).",
+  ],
+  [
+    "Functions",
+    "This metric tells you the ratio of functions that are under test.",
+  ],
+  [
+    "Lines",
+    "This metric tells you the ratio of lines of code that are under test.",
+  ],
+]);
 
 const getEmoji = (kindEmo) => {
   let emoji = "";
@@ -37772,39 +37790,6 @@ const getRelevantValues = (doc) => {
   }
 
   return output;
-};
-
-const createTable = (covMap) => {
-  let table = [];
-  let tableHeader = [];
-  let tableBody = [];
-
-  const containsHeader = (header) => {
-    return tableHeader.map((h) => h.data).includes(header);
-  };
-
-  for (const [key, value] of covMap.entries()) {
-    for (const [key2, value2] of Object.entries(value)) {
-      let newRow = [];
-      const coverageContext = `${key} - ${key2}`;
-      if (!containsHeader("Coverage Context")) {
-        tableHeader.push({ data: "Coverage Context", header: true });
-      }
-      newRow.push(coverageContext);
-      for (const [key3, value3] of Object.entries(value2)) {
-        if (!containsHeader(key3)) {
-          tableHeader.push({ data: key3, header: true });
-        }
-        newRow.push(String(value3));
-      }
-      tableBody.push(newRow);
-    }
-  }
-
-  table.push(Array.from(new Set(tableHeader)));
-  table.push(...tableBody);
-
-  return table;
 };
 
 const calculateDiff = (covMap) => {
@@ -37885,8 +37870,11 @@ const run = async () => {
       let lastRow = table[table.length - 1];
       let lastColRow = lastRow[lastRow.length - 1]; // Total
       let secondLastColRow = lastRow[lastRow.length - 2]; // Covered
-      let coveredPct =
-        (Number(secondLastColRow) / Number(lastColRow)) * 100 ?? 0;
+      let coveredPct = isNaN(
+        (Number(secondLastColRow) / Number(lastColRow)) * 100
+      )
+        ? 0
+        : (Number(secondLastColRow) / Number(lastColRow)) * 100;
       let coveredPctStr = String(coveredPct) + "%";
       let hasFailed =
         coveredPct <= 50 && ["Functions"].includes(category) && lastColRow > 1;
@@ -37897,9 +37885,9 @@ const run = async () => {
         ? getEmoji("fail")
         : getEmoji("success");
 
-      summary.addQuote(
-        `PR Coverage ${table[0][0].data}: ${coveredPctStr} ${prCoverageResultEmoji}`,
-        `PR Code Covered Percentage: ${coveredPctStr} ${prCoverageResultEmoji}`
+      summary.addDetails(
+        `PR Coverage ${category}: ${coveredPctStr} ${prCoverageResultEmoji}`,
+        categoryDetails.get(category)
       );
       summary.addTable(table);
     }
@@ -37914,7 +37902,10 @@ const run = async () => {
   }
 };
 
-run();
+run().then((exitCode) => {
+  core.setOutput("exit-code", exitCode);
+  process.exit(exitCode);
+});
 
 })();
 
