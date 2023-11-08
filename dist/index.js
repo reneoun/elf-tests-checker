@@ -37833,13 +37833,16 @@ const createDiffTables = (covMap) => {
       let tmpBodyRow = [];
       tmpBodyRow.push(branchName);
       for (const covValue of objCovKeys2) {
-        tmpBodyRow.push(covMap.get(branchName)[covName][covValue]);
+        let value = covMap.get(branchName)[covName][covValue];
+        value =
+          typeof value === "number" ? String(value.toFixed(2)) ?? "0" : value;
+        tmpBodyRow.push(value);
       }
       tmpBody.push(tmpBodyRow);
     }
     tables.push([tmpHeader, ...tmpBody]);
   }
-  console.log("TABLES", tables);
+
   return tables;
 };
 
