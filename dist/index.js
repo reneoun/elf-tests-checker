@@ -37738,6 +37738,12 @@ const getEmoji = (kindEmo) => {
       emoji =
         neutral_emoticons[Math.floor(Math.random() * neutral_emoticons.length)];
       break;
+    case "success":
+      emoji = "✅";
+      break;
+    case "fail":
+      emoji = "❌";
+      break;
     default:
       emoji =
         happy_emoticons[Math.floor(Math.random() * happy_emoticons.length)];
@@ -37848,6 +37854,8 @@ const createDiffTables = (covMap) => {
 
 const run = async () => {
   const coverageMap = new Map();
+  const githubToken = core.getInput("GITHUB_TOKEN");
+  const octokit = github.getOctokit(githubToken);
 
   let inputCoverageMain = core.getInput("coverage-main") ?? null;
   let inputCoverageBranch = core.getInput("coverage-branch") ?? null;
@@ -37871,8 +37879,24 @@ const run = async () => {
 
     let summary = core.summary.addHeading("Coverage Report :test_tube:");
     for (const table of sumTable) {
+      let category = table[0][0].data;
+
+      let lastRow = table[table.length - 1];
+      let lastColRow = lastRow[lastRow.length - 1]; // Total
+      let secondLastColRow = lastRow[lastRow.length - 2]; // Covered
+      let coveredPct = (Number(secondLastColRow) / Number(lastColRow)) * 100;
+      let coveredPctStr = String(coveredPct) + "%";
+      let hasFailed =
+        coveredPct <= 50 && ["Functions"].includes(category) && lastColRow > 1;
+      let prCoverageResultEmoji = hasFailed
+        ? getEmoji("fail")
+        : getEmoji("success");
+
+      summary.addDetails(
+        `PR Coverage ${table[0][0].data}`,
+        `PR Code Covered Percentage: ${coveredPctStr} ${prCoverageResultEmoji}`
+      );
       summary.addTable(table);
-      console.log(table);
     }
     summary.write();
   } catch (error) {
