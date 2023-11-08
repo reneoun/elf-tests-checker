@@ -8,19 +8,28 @@ const happy_emoticons = ["😀", "😃", "😄", "😁", "😆", "😊", "😇",
 const categoryDetails = new Map([
   [
     "Statements",
-    "This metric simply tells you the ratio of statements in an application that are currently under testing (Depending on the programming language, a statement can span multiple lines and a single line could contain multiple statements).",
+    [
+      0,
+      "This metric simply tells you the ratio of statements in an application that are currently under testing (Depending on the programming language, a statement can span multiple lines and a single line could contain multiple statements).",
+    ],
   ],
   [
     "Branches",
-    "Branch coverage, as we’ve seen, is about whether all branches—or paths of execution—in an application are under test (Conditional statements, such as if and switch statements, create branches).",
+    [
+      0,
+      "Branch coverage, as we’ve seen, is about whether all branches—or paths of execution—in an application are under test (Conditional statements, such as if and switch statements, create branches).",
+    ],
   ],
   [
     "Functions",
-    "This metric tells you the ratio of functions that are under test.",
+    [50, "This metric tells you the ratio of functions that are under test."],
   ],
   [
     "Lines",
-    "This metric tells you the ratio of lines of code that are under test.",
+    [
+      0,
+      "This metric tells you the ratio of lines of code that are under test.",
+    ],
   ],
 ]);
 
@@ -155,7 +164,7 @@ const run = async () => {
         : (Number(secondLastColRow) / Number(lastColRow)) * 100;
       let coveredPctStr = String(coveredPct) + "%";
       let hasFailed =
-        coveredPct <= 50 && ["Functions"].includes(category) && lastColRow > 1;
+        coveredPct < 50 && ["Functions"].includes(category) && lastColRow > 1;
 
       coverageResults.push(!hasFailed);
 
@@ -164,8 +173,10 @@ const run = async () => {
         : getEmoji("success");
 
       summary.addDetails(
-        `PR Coverage ${category}: ${coveredPctStr} ${prCoverageResultEmoji}`,
-        categoryDetails.get(category)
+        `PR Coverage ${category}: **${coveredPctStr}** ${prCoverageResultEmoji} (Target: ${
+          categoryDetails.get(category)[0]
+        }%)`,
+        `_${categoryDetails.get(category)[1]}_`
       );
       summary.addTable(table);
     }
