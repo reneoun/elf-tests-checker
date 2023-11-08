@@ -158,27 +158,37 @@ const run = async () => {
     let sumTable = createDiffTables(coverageMap);
 
     let summary = core.summary.addHeading("Coverage Report :test_tube:");
+    let coverageResults = [];
     for (const table of sumTable) {
       let category = table[0][0].data;
 
       let lastRow = table[table.length - 1];
       let lastColRow = lastRow[lastRow.length - 1]; // Total
       let secondLastColRow = lastRow[lastRow.length - 2]; // Covered
-      let coveredPct = (Number(secondLastColRow) / Number(lastColRow)) * 100;
+      let coveredPct =
+        (Number(secondLastColRow) / Number(lastColRow)) * 100 ?? 0;
       let coveredPctStr = String(coveredPct) + "%";
       let hasFailed =
         coveredPct <= 50 && ["Functions"].includes(category) && lastColRow > 1;
+
+      coverageResults.push(!hasFailed);
+
       let prCoverageResultEmoji = hasFailed
         ? getEmoji("fail")
         : getEmoji("success");
 
-      summary.addDetails(
-        `PR Coverage ${table[0][0].data}`,
+      summary.addQuote(
+        `PR Coverage ${table[0][0].data}: ${coveredPctStr} ${prCoverageResultEmoji}`,
         `PR Code Covered Percentage: ${coveredPctStr} ${prCoverageResultEmoji}`
       );
       summary.addTable(table);
     }
     summary.write();
+
+    const testCoverageAnalysisSuccess = coverageResults.every(
+      (result) => result === true
+    );
+    return testCoverageAnalysisSuccess ? 0 : 1;
   } catch (error) {
     console.log(`Error[${getEmoji("sad")}]: ${error}`);
   }
