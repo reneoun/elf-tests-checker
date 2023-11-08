@@ -163,8 +163,11 @@ const run = async () => {
         ? 0
         : (Number(secondLastColRow) / Number(lastColRow)) * 100;
       let coveredPctStr = String(coveredPct) + "%";
+      const categoryPctTarget = categoryDetails.get(category)[0];
       let hasFailed =
-        coveredPct < 50 && ["Functions"].includes(category) && lastColRow > 1;
+        coveredPct < categoryPctTarget &&
+        ["Functions"].includes(category) &&
+        lastColRow > 1;
 
       coverageResults.push(!hasFailed);
 
@@ -172,12 +175,10 @@ const run = async () => {
         ? getEmoji("fail")
         : getEmoji("success");
 
-      summary.addDetails(
-        `PR Coverage ${category}: **${coveredPctStr}** ${prCoverageResultEmoji} (Target: ${
-          categoryDetails.get(category)[0]
-        }%)`,
-        `_${categoryDetails.get(category)[1]}_`
-      );
+      let textDetails = `PR Coverage ${category}: ${coveredPctStr} ${prCoverageResultEmoji} (Target: ${categoryPctTarget}%${
+        category === "Functions" ? " *For 2 or more new Functions" : ""
+      })`;
+      summary.addDetails(textDetails, `${categoryDetails.get(category)[1]}`);
       summary.addTable(table);
     }
     summary.write();
