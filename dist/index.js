@@ -37497,14 +37497,6 @@ module.exports = require("fs");
 
 /***/ }),
 
-/***/ 3292:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("fs/promises");
-
-/***/ }),
-
 /***/ 3685:
 /***/ ((module) => {
 
@@ -37720,9 +37712,7 @@ var __webpack_exports__ = {};
 (() => {
 const core = __nccwpck_require__(2186);
 const github = __nccwpck_require__(5438);
-const { context } = __nccwpck_require__(5438);
 const parser = __nccwpck_require__(4363);
-const fs = __nccwpck_require__(3292);
 
 const sad_emoticons = ["😭", "😢", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣"];
 const neutral_emoticons = ["😐", "😑", "😶", "🙄", "😒", "🤐", "😬"];
@@ -37904,7 +37894,6 @@ const run = async () => {
 
 run().then((exitCode) => {
   core.setOutput("exit-code", exitCode);
-  process.exit(exitCode);
 });
 
 })();

@@ -1,8 +1,6 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
-const { context } = require("@actions/github");
 const parser = require("node-html-parser");
-const fs = require("fs/promises");
 
 const sad_emoticons = ["😭", "😢", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣"];
 const neutral_emoticons = ["😐", "😑", "😶", "🙄", "😒", "🤐", "😬"];
@@ -184,5 +182,4 @@ const run = async () => {
 
 run().then((exitCode) => {
   core.setOutput("exit-code", exitCode);
-  process.exit(exitCode);
 });
