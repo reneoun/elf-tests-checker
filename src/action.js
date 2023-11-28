@@ -156,7 +156,8 @@ const run = async () => {
   //     ? "src/coverage/Chrome Headless/index.html"
   //     : coveragePath;
 
-  const coverageFile = await fs.readFileAsync(covPath, "utf8");
+  const coverageFile = fs.readFileSync(covPath, "utf8");
+  // const coverageFile = await fs.readFileAsync(covPath, "utf8");
 
   // const coverageFile = await octokit.rest.repos.getContent({
   //   owner: github.context.repo.owner,
