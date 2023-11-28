@@ -6,14 +6,13 @@ inputs:
   GITHUB_TOKEN:
     description: 'GitHub Token'
     required: true
-  coverage-main:
-    description: 'Main coverage file'
-    required: false
-  coverage-branch:
-    description: 'Branch coverage file'
-    required: false
   coverage-path:
-    description: 'Path to coverage files'
+    default: './src/coverage/Chrome Headless/index.html'
+    description: 'Path to current coverage files'
+    required: false
+  main-coverage-path:
+    default: './main-coverage.html'
+    description: 'Path to Main coverage files'
     required: false
 
 runs:

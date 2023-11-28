@@ -37845,58 +37845,13 @@ const run = async () => {
   const githubToken = core.getInput("GITHUB_TOKEN");
   const octokit = github.getOctokit(githubToken);
 
-  let inputCoverageMain = core.getInput("coverage-main") ?? null;
-  let inputCoverageBranch = core.getInput("coverage-branch") ?? null;
-  let coveragePath = core.getInput("coverage-path") ?? null;
+  let branchCoveragePath = core.getInput("coverage-path");
+  let mainCoveragePath = core.getInput("main-coverage-path");
 
-  // if (coveragePath !== null) {
-  // inputCoverageMain = await octokit.rest.repos.getContent({
-  //   owner: github.context.repo.owner,
-  //   repo: github.context.repo.repo,
-  //   path: coveragePath + "/main/index.html",
-  // });
-
-  // inputCoverageBranch = await octokit.rest.repos.getContent({
-  //   owner: github.context.repo.owner,
-  //   repo: github.context.repo.repo,
-  //   path: coveragePath + "/branch/index.html",
-  // });
-
-  let covPath = "./src/coverage/Chrome Headless/index.html";
-  // let covPath =
-  //   coveragePath == null
-  //     ? "src/coverage/Chrome Headless/index.html"
-  //     : coveragePath;
-
-  const coverageFile = fs.readFileSync(covPath, "utf8");
-  // const coverageFile = await fs.readFileAsync(covPath, "utf8");
-
-  // const coverageFile = await octokit.rest.repos.getContent({
-  //   owner: github.context.repo.owner,
-  //   repo: github.context.repo.repo,
-  //   path: "src/coverage/Chrome Headless/index.html",
-  // });
-  console.log("1📃", covPath, coverageFile);
-  // const coverageFile2 = await octokit.request(
-  //   "GET /repos/{owner}/{repo}/contents/{path}",
-  //   {
-  //     owner: github.context.repo.owner,
-  //     repo: github.context.repo.repo,
-  //     path: covPath,
-  //     headers: {
-  //       "X-GitHub-Api-Version": "2022-11-28",
-  //     },
-  //   }
-  // );
-  // console.log("12📃", covPath, coverageFile2);
-
-  // const coverageFileContent = Buffer.from(
-  //   coverageFile2.data.content,
-  //   "base64"
-  // ).toString();
-
-  // console.log("2📃", coverageFileContent);
-  // }
+  const branchCoverageFile = fs.readFileSync(branchCoveragePath, "utf8");
+  const mainCoverageFile = fs.readFileSync(mainCoveragePath, "utf8");
+  console.log("1📃", covPath, branchCoverageFile);
+  console.log("2📃", covPath, mainCoverageFile);
 
   // Get the owner, repo, and commit SHA from the context
   const { owner, repo } = github.context.repo;
@@ -37911,23 +37866,25 @@ const run = async () => {
 
   // Extract changed filenames
   const changedFiles = commitData.files.map((file) => file.filename);
+  const tsFiles = changedFiles.filter(
+    (file) => file.endsWith(".ts") && !file.endsWith(".spec.ts")
+  );
+  const tsTestFiles = changedFiles.filter((file) => file.endsWith(".spec.ts"));
 
-  console.log("Changed Files📂:", changedFiles);
+  console.log("Changed TS Files📂:", tsFiles);
+  console.log("Changed TS Spec Files📂:", tsTestFiles);
 
-  if (inputCoverageMain === null || inputCoverageBranch === null) {
+  if (mainCoveragePath === null || branchCoverageFile === null) {
     core.notice(`No coverage files found. Exiting. ${getEmoji("neutral")}`);
     return 0;
   }
 
-  let covMainDoc = parser.parse(inputCoverageMain);
-  let covBranchDoc = parser.parse(inputCoverageBranch);
+  let covMainDoc = parser.parse(mainCoveragePath);
+  let covBranchDoc = parser.parse(branchCoverageFile);
 
   try {
     coverageMap.set("main", getRelevantValues(covMainDoc));
     coverageMap.set("branch", getRelevantValues(covBranchDoc));
-
-    // console.log("MAIN", coverageMap.get("main"));
-    // console.log("BRANCH", coverageMap.get("branch"));
 
     let sumTable = createDiffTables(coverageMap);
 
