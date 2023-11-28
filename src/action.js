@@ -149,7 +149,10 @@ const run = async () => {
   //   path: coveragePath + "/branch/index.html",
   // });
 
-  let covPath = coveragePath ?? "src/coverage/Chrome Headless/index.html";
+  let covPath =
+    coveragePath == null
+      ? "src/coverage/Chrome Headless/index.html"
+      : coveragePath;
 
   const coverageFile = await octokit.rest.repos.getContent({
     owner: github.context.repo.owner,
@@ -165,6 +168,22 @@ const run = async () => {
 
   console.log("2📃", coverageFileContent);
   // }
+
+  // Get the owner, repo, and commit SHA from the context
+  const { owner, repo } = github.context.repo;
+  const commitSha = github.context.sha;
+
+  // Fetch commit data
+  const { data: commitData } = await octokit.rest.repos.getCommit({
+    owner,
+    repo,
+    ref: commitSha,
+  });
+
+  // Extract changed filenames
+  const changedFiles = commitData.files.map((file) => file.filename);
+
+  console.log("Changed Files📂:", changedFiles);
 
   if (inputCoverageMain === null || inputCoverageBranch === null) {
     core.notice(`No coverage files found. Exiting. ${getEmoji("neutral")}`);
