@@ -138,8 +138,8 @@ const run = async () => {
 
   const branchCoverageFile = fs.readFileSync(branchCoveragePath, "utf8");
   const mainCoverageFile = fs.readFileSync(mainCoveragePath, "utf8");
-  console.log("1📃", covPath, branchCoverageFile);
-  console.log("2📃", covPath, mainCoverageFile);
+  console.log("1📃", branchCoverageFile);
+  console.log("2📃", mainCoverageFile);
 
   // Get the owner, repo, and commit SHA from the context
   const { owner, repo } = github.context.repo;
