@@ -1,6 +1,7 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
 const parser = require("node-html-parser");
+const fs = require("fs");
 
 const sad_emoticons = ["😭", "😢", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣"];
 const neutral_emoticons = ["😐", "😑", "😶", "🙄", "😒", "🤐", "😬"];

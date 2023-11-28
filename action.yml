@@ -12,6 +12,9 @@ inputs:
   coverage-branch:
     description: 'Branch coverage file'
     required: false
+  coverage-path:
+    description: 'Path to coverage files'
+    required: false
 
 runs:
   using: 'node20'

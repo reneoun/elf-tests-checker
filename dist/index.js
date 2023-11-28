@@ -37713,6 +37713,7 @@ var __webpack_exports__ = {};
 const core = __nccwpck_require__(2186);
 const github = __nccwpck_require__(5438);
 const parser = __nccwpck_require__(4363);
+const fs = __nccwpck_require__(7147);
 
 const sad_emoticons = ["😭", "😢", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣"];
 const neutral_emoticons = ["😐", "😑", "😶", "🙄", "😒", "🤐", "😬"];
