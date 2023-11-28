@@ -37846,6 +37846,36 @@ const run = async () => {
 
   let inputCoverageMain = core.getInput("coverage-main") ?? null;
   let inputCoverageBranch = core.getInput("coverage-branch") ?? null;
+  let coveragePath = core.getInput("coverage-path") ?? null;
+
+  // if (coveragePath !== null) {
+  // inputCoverageMain = await octokit.rest.repos.getContent({
+  //   owner: github.context.repo.owner,
+  //   repo: github.context.repo.repo,
+  //   path: coveragePath + "/main/index.html",
+  // });
+
+  // inputCoverageBranch = await octokit.rest.repos.getContent({
+  //   owner: github.context.repo.owner,
+  //   repo: github.context.repo.repo,
+  //   path: coveragePath + "/branch/index.html",
+  // });
+
+  let covPath = coveragePath ?? "./src/coverage/Chrome Headless/index.html";
+
+  const coverageFile = await octokit.rest.repos.getContent({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    path: covPath,
+  });
+
+  const coverageFileContent = Buffer.from(
+    coverageFile.data.content,
+    "base64"
+  ).toString();
+
+  console.log("📃", coverageFileContent);
+  // }
 
   if (inputCoverageMain === null || inputCoverageBranch === null) {
     core.notice(`No coverage files found. Exiting. ${getEmoji("neutral")}`);
