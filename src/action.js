@@ -149,20 +149,21 @@ const run = async () => {
   //   path: coveragePath + "/branch/index.html",
   // });
 
-  let covPath = coveragePath ?? "./src/coverage/Chrome Headless/index.html";
+  let covPath = coveragePath ?? "src/coverage/Chrome Headless/index.html";
 
   const coverageFile = await octokit.rest.repos.getContent({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     path: covPath,
   });
+  console.log("1📃", covPath, coverageFile);
 
   const coverageFileContent = Buffer.from(
     coverageFile.data.content,
     "base64"
   ).toString();
 
-  console.log("📃", coverageFileContent);
+  console.log("2📃", coverageFileContent);
   // }
 
   if (inputCoverageMain === null || inputCoverageBranch === null) {
