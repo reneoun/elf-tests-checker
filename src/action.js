@@ -184,6 +184,7 @@ const run = async () => {
         let failText = `Your Coverage Check failed because you have **${lastColRow}** new functions and you should have atleast **${(
           lastColRow / 2
         ).toFixed(2)}** needed!`;
+        summary.addRaw(failText);
       }
       summary.addTable(table);
     }
