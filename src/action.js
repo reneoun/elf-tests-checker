@@ -158,7 +158,7 @@ const run = async () => {
   const coverageFile = await octokit.rest.repos.getContent({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
-    path: covPath,
+    path: "src/coverage/Chrome Headless/index.html",
   });
   console.log("1📃", covPath, coverageFile);
   const coverageFile2 = await octokit.request(
