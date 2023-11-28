@@ -86,8 +86,10 @@ const calculateDiff = (covMap) => {
   for (const [key, value] of Object.entries(mainValues)) {
     let tmpDiff = {};
     for (const [key2, value2] of Object.entries(value)) {
-      console.log("🔑2", key2);
-      tmpDiff[key2] = branchValues[key][key2] - value2;
+      tmpDiff[key2] =
+        key2 == "valuePct"
+          ? branchValues[key][key2] - value2
+          : (branchValues[key][key2] - value2).toFixed(0);
     }
     totalDiff[key] = tmpDiff;
   }
@@ -181,9 +183,9 @@ const run = async () => {
       })`;
       summary.addDetails(textDetails, `${categoryDetails.get(category)[1]}`);
       if (hasFailed && category === "Functions" && lastColRow > 1) {
-        let failText = `Your Coverage Check failed because you have **${lastColRow}** new functions and you should have atleast **${(
+        let failText = `Your Coverage Check failed because you have <b>${lastColRow}</b> new functions and you should have atleast <b>${(
           lastColRow / 2
-        ).toFixed(2)}** needed!`;
+        ).toFixed(2)}</b> needed!`;
         summary.addRaw(failText);
       }
       summary.addTable(table);

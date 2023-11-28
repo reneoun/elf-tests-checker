@@ -11,6 +11,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: reneoun/elf-tests-checker@v1.8.37
+      - uses: reneoun/elf-tests-checker@v1.8.38
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
