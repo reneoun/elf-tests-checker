@@ -37846,7 +37846,7 @@ const run = async () => {
 
   let inputCoverageMain = core.getInput("coverage-main") ?? null;
   let inputCoverageBranch = core.getInput("coverage-branch") ?? null;
-  // let coveragePath = core.getInput("coverage-path") ?? null;
+  let coveragePath = core.getInput("coverage-path") ?? null;
 
   // if (coveragePath !== null) {
   // inputCoverageMain = await octokit.rest.repos.getContent({
@@ -37867,31 +37867,33 @@ const run = async () => {
   //     ? "src/coverage/Chrome Headless/index.html"
   //     : coveragePath;
 
-  const coverageFile = await octokit.rest.repos.getContent({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    path: "src/coverage/Chrome Headless/index.html",
-  });
+  const coverageFile = await fs.readFileAsync(covPath, "utf8");
+
+  // const coverageFile = await octokit.rest.repos.getContent({
+  //   owner: github.context.repo.owner,
+  //   repo: github.context.repo.repo,
+  //   path: "src/coverage/Chrome Headless/index.html",
+  // });
   console.log("1📃", covPath, coverageFile);
-  const coverageFile2 = await octokit.request(
-    "GET /repos/{owner}/{repo}/contents/{path}",
-    {
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      path: covPath,
-      headers: {
-        "X-GitHub-Api-Version": "2022-11-28",
-      },
-    }
-  );
-  console.log("12📃", covPath, coverageFile2);
+  // const coverageFile2 = await octokit.request(
+  //   "GET /repos/{owner}/{repo}/contents/{path}",
+  //   {
+  //     owner: github.context.repo.owner,
+  //     repo: github.context.repo.repo,
+  //     path: covPath,
+  //     headers: {
+  //       "X-GitHub-Api-Version": "2022-11-28",
+  //     },
+  //   }
+  // );
+  // console.log("12📃", covPath, coverageFile2);
 
-  const coverageFileContent = Buffer.from(
-    coverageFile2.data.content,
-    "base64"
-  ).toString();
+  // const coverageFileContent = Buffer.from(
+  //   coverageFile2.data.content,
+  //   "base64"
+  // ).toString();
 
-  console.log("2📃", coverageFileContent);
+  // console.log("2📃", coverageFileContent);
   // }
 
   // Get the owner, repo, and commit SHA from the context
