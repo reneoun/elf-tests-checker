@@ -185,9 +185,9 @@ const run = async () => {
       if (hasFailed && category === "Functions" && lastColRow > 1) {
         let failText = `<blockquote>⚠️ Your Coverage Check failed because you have <b>${lastColRow}</b> new functions and you should have atleast <b>${(
           lastColRow / 2
-        ).toFixed(0)}</b> needed and you got <b>${secondLastColRow.toFixed(
+        ).toFixed(
           0
-        )}!</blockquote>`;
+        )}</b> needed and you got <b>${secondLastColRow}</b>!</blockquote>`;
         summary.addRaw(failText);
       }
       summary.addTable(table);
