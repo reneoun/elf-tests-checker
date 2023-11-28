@@ -134,7 +134,7 @@ const run = async () => {
 
   let inputCoverageMain = core.getInput("coverage-main") ?? null;
   let inputCoverageBranch = core.getInput("coverage-branch") ?? null;
-  let coveragePath = core.getInput("coverage-path") ?? null;
+  // let coveragePath = core.getInput("coverage-path") ?? null;
 
   // if (coveragePath !== null) {
   // inputCoverageMain = await octokit.rest.repos.getContent({
@@ -149,7 +149,7 @@ const run = async () => {
   //   path: coveragePath + "/branch/index.html",
   // });
 
-  let covPath = "src/coverage/Chrome Headless/index.html";
+  let covPath = "./src/coverage/Chrome Headless/index.html";
   // let covPath =
   //   coveragePath == null
   //     ? "src/coverage/Chrome Headless/index.html"
@@ -160,15 +160,18 @@ const run = async () => {
     repo: github.context.repo.repo,
     path: covPath,
   });
+  console.log("1📃", covPath, coverageFile);
   const coverageFile2 = await octokit.request(
     "GET /repos/{owner}/{repo}/contents/{path}",
     {
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
       path: covPath,
+      headers: {
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
     }
   );
-  console.log("1📃", covPath, coverageFile);
   console.log("12📃", covPath, coverageFile2);
 
   const coverageFileContent = Buffer.from(
