@@ -37895,9 +37895,11 @@ const run = async () => {
       })`;
       summary.addDetails(textDetails, `${categoryDetails.get(category)[1]}`);
       if (hasFailed && category === "Functions" && lastColRow > 1) {
-        let failText = `Your Coverage Check failed because you have <b>${lastColRow}</b> new functions and you should have atleast <b>${(
+        let failText = `<blockquote>⚠️ Your Coverage Check failed because you have <b>${lastColRow}</b> new functions and you should have atleast <b>${(
           lastColRow / 2
-        ).toFixed(2)}</b> needed!`;
+        ).toFixed(0)}</b> needed and you got <b>${secondLastColRow.toFixed(
+          0
+        )}!</blockquote>`;
         summary.addRaw(failText);
       }
       summary.addTable(table);
