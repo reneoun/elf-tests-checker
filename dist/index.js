@@ -37859,8 +37859,8 @@ const run = async () => {
     coverageMap.set("main", getRelevantValues(covMainDoc));
     coverageMap.set("branch", getRelevantValues(covBranchDoc));
 
-    console.log("MAIN", coverageMap.get("main"));
-    console.log("BRANCH", coverageMap.get("branch"));
+    // console.log("MAIN", coverageMap.get("main"));
+    // console.log("BRANCH", coverageMap.get("branch"));
 
     let sumTable = createDiffTables(coverageMap);
 
@@ -37899,7 +37899,7 @@ const run = async () => {
           lastColRow / 2
         ).toFixed(
           0
-        )}</b> needed and you got <b>${secondLastColRow}</b>!</blockquote>`;
+        )}</b> new Tests and you got <b>${secondLastColRow}</b>!</blockquote>`;
         summary.addRaw(failText);
       }
       summary.addTable(table);
