@@ -132,6 +132,9 @@ const createFileCoverageTable = async () => {
   const { owner, repo } = github.context.repo;
   const commitSha = github.context.sha;
 
+  const githubToken = core.getInput("GITHUB_TOKEN");
+  const octokit = github.getOctokit(githubToken);
+
   // Fetch commit data
   const { data: commitData } = await octokit.rest.repos.getCommit({
     owner,
@@ -187,8 +190,6 @@ const createFileCoverageTable = async () => {
 
 const run = async () => {
   const coverageMap = new Map();
-  // const githubToken = core.getInput("GITHUB_TOKEN");
-  // const octokit = github.getOctokit(githubToken);
 
   let branchCoveragePath = core.getInput("coverage-path");
   let mainCoveragePath = core.getInput("main-coverage-path");
