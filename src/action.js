@@ -138,8 +138,9 @@ const run = async () => {
 
   const branchCoverageFile = fs.readFileSync(branchCoveragePath, "utf8");
   const mainCoverageFile = fs.readFileSync(mainCoveragePath, "utf8");
-  console.log("1📃", branchCoverageFile);
-  console.log("2📃", mainCoverageFile);
+
+  // console.log("1📃", branchCoverageFile);
+  // console.log("2📃", mainCoverageFile);
 
   // Get the owner, repo, and commit SHA from the context
   const { owner, repo } = github.context.repo;
@@ -167,12 +168,17 @@ const run = async () => {
     return 0;
   }
 
-  let covMainDoc = parser.parse(mainCoveragePath);
+  let covMainDoc = parser.parse(mainCoverageFile);
   let covBranchDoc = parser.parse(branchCoverageFile);
+
+  console.log("covMainDoc📃:", covMainDoc);
+  console.log("covBranchDoc📃:", covBranchDoc);
 
   try {
     coverageMap.set("main", getRelevantValues(covMainDoc));
     coverageMap.set("branch", getRelevantValues(covBranchDoc));
+
+    console.log("coverageMap📃:", coverageMap);
 
     let sumTable = createDiffTables(coverageMap);
 
