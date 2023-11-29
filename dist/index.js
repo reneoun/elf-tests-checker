@@ -37858,7 +37858,7 @@ const createFileCoverageTable = async () => {
   const changedFiles = commitData.files.map((file) => file.filename);
   const changedFileNames = changedFiles
     .map((file) => file.split("/").pop())
-    .filter((file) => file.includes(".module."));
+    .filter((file) => !file.includes(".module."));
   const tsFiles = changedFileNames.filter(
     (file) => file.endsWith(".ts") && !file.endsWith(".spec.ts")
   );
@@ -37905,7 +37905,11 @@ const createFileCoverageTable = async () => {
   }
 
   let table = [tableHeader, ...tableBody];
-  return [table, ((coveredFilesPct / filesChecked.length) * 100).toFixed(2)];
+  let pct =
+    coveredFilesPct === 0 && filesChecked.length === 0
+      ? 100.0
+      : ((coveredFilesPct / filesChecked.length) * 100).toFixed(2);
+  return [table, pct];
 };
 
 const run = async () => {
