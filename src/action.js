@@ -102,7 +102,6 @@ const createDiffTables = (covMap) => {
 
   calculateDiff(covMap);
 
-  //TODO: Add Total
   const covMapKeys = Array.from(covMap.keys()); //main, branch, difference
   const objCovKeys = Object.keys(covMap.get(covMapKeys[0])); //statements, branches, functions, lines
   const objCovKeys2 = Object.keys(covMap.get(covMapKeys[0])[objCovKeys[0]]); //valuePct, covered, total
@@ -128,20 +127,7 @@ const createDiffTables = (covMap) => {
   return tables;
 };
 
-const run = async () => {
-  const coverageMap = new Map();
-  const githubToken = core.getInput("GITHUB_TOKEN");
-  const octokit = github.getOctokit(githubToken);
-
-  let branchCoveragePath = core.getInput("coverage-path");
-  let mainCoveragePath = core.getInput("main-coverage-path");
-
-  const branchCoverageFile = fs.readFileSync(branchCoveragePath, "utf8");
-  const mainCoverageFile = fs.readFileSync(mainCoveragePath, "utf8");
-
-  // console.log("1📃", branchCoverageFile);
-  // console.log("2📃", mainCoverageFile);
-
+const createFileCoverageTable = async () => {
   // Get the owner, repo, and commit SHA from the context
   const { owner, repo } = github.context.repo;
   const commitSha = github.context.sha;
@@ -155,13 +141,60 @@ const run = async () => {
 
   // Extract changed filenames
   const changedFiles = commitData.files.map((file) => file.filename);
-  const tsFiles = changedFiles.filter(
+  const changedFileNames = changedFiles.map((file) => file.split("/").pop());
+  const tsFiles = changedFileNames.filter(
     (file) => file.endsWith(".ts") && !file.endsWith(".spec.ts")
   );
-  const tsTestFiles = changedFiles.filter((file) => file.endsWith(".spec.ts"));
+  const tsTestFiles = changedFileNames.filter((file) =>
+    file.endsWith(".spec.ts")
+  );
 
   console.log("Changed TS Files📂:", tsFiles);
   console.log("Changed TS Spec Files📂:", tsTestFiles);
+
+  let coveredFilesPct = 0;
+  let tableHeader = [
+    { data: "TS File Name", header: true },
+    { data: "TS Coverage File", header: true },
+    { data: "Covered", header: true },
+  ];
+  let tableBody = [];
+  let filesChecked = [];
+  for (const tsFile of tsFiles) {
+    const specFile = tsFile.replace(".ts", ".spec.ts");
+    let tsCoverageFile = tsTestFiles.find((file) => file == specFile);
+    tableBody.push([
+      tsFile,
+      tsCoverageFile ?? "Not Found",
+      !!tsCoverageFile ? "YES🟢" : "NO🔴",
+    ]);
+    filesChecked.push(tsFile);
+    if (tsCoverageFile) {
+      filesChecked.push(tsCoverageFile);
+      coveredFilesPct++;
+    }
+  }
+  for (const tsTestFile of tsTestFiles) {
+    if (!filesChecked.includes(tsTestFile)) {
+      tableBody.push(["Not Found", tsTestFile, "OK🟡"]);
+      filesChecked.push(tsTestFile);
+    }
+  }
+
+  let table = [tableHeader, ...tableBody];
+  return [table, ((coveredFilesPct / filesChecked.length) * 100).toFixed(2)];
+};
+
+const run = async () => {
+  const coverageMap = new Map();
+  // const githubToken = core.getInput("GITHUB_TOKEN");
+  // const octokit = github.getOctokit(githubToken);
+
+  let branchCoveragePath = core.getInput("coverage-path");
+  let mainCoveragePath = core.getInput("main-coverage-path");
+
+  const branchCoverageFile = fs.readFileSync(branchCoveragePath, "utf8");
+  const mainCoverageFile = fs.readFileSync(mainCoveragePath, "utf8");
 
   if (mainCoveragePath === null || branchCoverageFile === null) {
     core.notice(`No coverage files found. Exiting. ${getEmoji("neutral")}`);
@@ -171,22 +204,25 @@ const run = async () => {
   let covMainDoc = parser.parse(mainCoverageFile);
   let covBranchDoc = parser.parse(branchCoverageFile);
 
-  console.log("covMainDoc📃:", covMainDoc);
-  console.log("covBranchDoc📃:", covBranchDoc);
-
   try {
     coverageMap.set("main", getRelevantValues(covMainDoc));
     coverageMap.set("branch", getRelevantValues(covBranchDoc));
 
-    console.log("coverageMap📃:", coverageMap);
-
     let sumTable = createDiffTables(coverageMap);
 
     let summary = core.summary.addHeading("Coverage Report :test_tube:");
+
+    let [fileCoverageTable, fileCoveragePct] = await createFileCoverageTable();
+    summary.addRaw(
+      `<blockquote>Changed TS File Coverage: ${fileCoveragePct}% ${getEmoji(
+        fileCoveragePct >= 50 ? "success" : "fail"
+      )}</blockquote>`
+    );
+    summary.addTable(fileCoverageTable);
+
     let coverageResults = [];
     for (const table of sumTable) {
       let category = table[0][0].data;
-
       let lastRow = table[table.length - 1];
       let lastColRow = lastRow[lastRow.length - 1]; // Total
       let secondLastColRow = lastRow[lastRow.length - 2]; // Covered
