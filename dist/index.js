@@ -37856,7 +37856,9 @@ const createFileCoverageTable = async () => {
 
   // Extract changed filenames
   const changedFiles = commitData.files.map((file) => file.filename);
-  const changedFileNames = changedFiles.map((file) => file.split("/").pop());
+  const changedFileNames = changedFiles
+    .map((file) => file.split("/").pop())
+    .filter((file) => file.includes(".module."));
   const tsFiles = changedFileNames.filter(
     (file) => file.endsWith(".ts") && !file.endsWith(".spec.ts")
   );
@@ -37876,22 +37878,28 @@ const createFileCoverageTable = async () => {
   let tableBody = [];
   let filesChecked = [];
   for (const tsFile of tsFiles) {
+    filesChecked.push(tsFile);
     const specFile = tsFile.replace(".ts", ".spec.ts");
     let tsCoverageFile = tsTestFiles.find((file) => file == specFile);
-    tableBody.push([
-      tsFile,
-      tsCoverageFile ?? "Not Found",
-      !!tsCoverageFile ? "YES🟢" : "NO🔴",
-    ]);
-    filesChecked.push(tsFile);
+
+    let tsFileNameValue = `**${tsFile}**`;
+    let tsCoverageFileValue = "Not Found";
+    let coveredValue = "🔴NO";
+
     if (tsCoverageFile) {
+      tsFileNameValue = tsFile;
+      tsCoverageFileValue = tsCoverageFile;
+      coveredValue = "🟢YES";
+
       filesChecked.push(tsCoverageFile);
       coveredFilesPct++;
     }
+
+    tableBody.push([tsFileNameValue, tsCoverageFileValue, coveredValue]);
   }
   for (const tsTestFile of tsTestFiles) {
     if (!filesChecked.includes(tsTestFile)) {
-      tableBody.push(["Not Found", tsTestFile, "OK🟡"]);
+      tableBody.push(["Not Found", tsTestFile, "🟡OK"]);
       filesChecked.push(tsTestFile);
     }
   }
@@ -37934,6 +37942,7 @@ const run = async () => {
     summary.addTable(fileCoverageTable);
 
     let coverageResults = [];
+
     for (const table of sumTable) {
       let category = table[0][0].data;
       let lastRow = table[table.length - 1];
@@ -37946,12 +37955,16 @@ const run = async () => {
         : (Number(secondLastColRow) / Number(lastColRow)) * 100;
       let coveredPctStr = String(coveredPct.toFixed(2)) + "%";
       const categoryPctTarget = categoryDetails.get(category)[0];
+      //TODO: Make Tresholds configurable in YAML
       let hasFailed =
         coveredPct < categoryPctTarget &&
         ["Functions"].includes(category) &&
         lastColRow > 1;
 
       coverageResults.push(!hasFailed);
+      if (category === "Functions" && lastColRow > 1) {
+        categoryDetails.get(category)[0] = coveredPct;
+      }
 
       let prCoverageResultEmoji = hasFailed
         ? getEmoji("fail")
