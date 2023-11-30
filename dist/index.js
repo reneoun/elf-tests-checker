@@ -37930,9 +37930,9 @@ const createFileCoverageTable = async () => {
 
   let table = [tableHeader, ...tableBody];
   let pct =
-    coveredFilesPct === 0 && filesChecked.length === 0
+    coveredFilesPct === 0 && tsFiles.length === 0
       ? 100.0
-      : ((coveredFilesPct / filesChecked.length) * 100).toFixed(2);
+      : ((coveredFilesPct / tsFiles.length) * 100).toFixed(2);
   return [table, pct];
 };
 
