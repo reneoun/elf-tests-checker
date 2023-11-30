@@ -37854,7 +37854,7 @@ createMDTableRaw = (tableIN) => {
         tableOUT += `<th>${cell.data}</th>`;
         continue;
       } else {
-        tableOUT += `<td>${cell.data}</td>`;
+        tableOUT += `<td>${cell}</td>`;
       }
     }
     tableOUT += "</tr>";
@@ -37962,15 +37962,9 @@ const run = async () => {
     let summary = core.summary.addHeading("Coverage Report :test_tube:");
 
     let [fileCoverageTable, fileCoveragePct] = await createFileCoverageTable();
-    // summary.addRaw(
-    //   `<blockquote>Changed TS File Coverage: ${fileCoveragePct}% ${getEmoji(
-    //     fileCoveragePct >= 50 ? "success" : "fail"
-    //   )}</blockquote>`
-    // );
-    // summary.addTable(fileCoverageTable);
     let rawTable = createMDTableRaw(fileCoverageTable);
     summary.addRaw(
-      `<details><summary>Changed TS File Coverage: ${fileCoveragePct}% ${getEmoji(
+      `<details><summary>📂Changed TS File Coverage: ${fileCoveragePct}% ${getEmoji(
         fileCoveragePct >= 50 ? "success" : "fail"
       )}</summary>${rawTable}</details>`
     );
@@ -38007,17 +38001,18 @@ const run = async () => {
       let textDetails = `PR Coverage ${category}: ${coveredPctStr} ${prCoverageResultEmoji} (Target: ${categoryPctTarget}%${
         category === "Functions" ? " *For 2 or more new Functions" : ""
       })`;
-      // summary.addDetails(textDetails, `${categoryDetails.get(category)[1]}`);
+      let failText =
+        hasFailed && category === "Functions" && lastColRow > 1
+          ? `⚠️ Your Coverage Check failed because you have <b>${lastColRow}</b> new functions and you should have atleast <b>${(
+              lastColRow / 2
+            ).toFixed(0)}</b> new Tests and you got <b>${secondLastColRow}</b>!`
+          : "";
 
-      if (hasFailed && category === "Functions" && lastColRow > 1) {
-        let failText = `<blockquote>⚠️ Your Coverage Check failed because you have <b>${lastColRow}</b> new functions and you should have atleast <b>${(
-          lastColRow / 2
-        ).toFixed(
-          0
-        )}</b> new Tests and you got <b>${secondLastColRow}</b>!</blockquote>`;
-        summary.addRaw(failText);
-      }
-      summary.addTable(table);
+      summary.addRaw(
+        `<details><summary>${textDetails}</summary><blockquote>${
+          categoryDetails.get(category)[1]
+        }</blockquote>${failText}${createMDTableRaw(table)}</details>`
+      );
     }
     summary.write();
 
