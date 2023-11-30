@@ -170,7 +170,7 @@ const createFileCoverageTable = async () => {
     const specFile = tsFile.replace(".ts", ".spec.ts");
     let tsCoverageFile = tsTestFiles.find((file) => file == specFile);
 
-    let tsFileNameValue = `**${tsFile}**`;
+    let tsFileNameValue = `<b>${tsFile}</b>`;
     let tsCoverageFileValue = "Not Found";
     let coveredValue = "🔴NO";
 
