@@ -37967,7 +37967,7 @@ const run = async () => {
 
       coverageResults.push(!hasFailed);
       if (category === "Functions" && lastColRow > 1) {
-        categoryDetails.get(category)[0] = coveredPct;
+        coverageResults.push(fileCoveragePct >= 50);
       }
 
       let prCoverageResultEmoji = hasFailed
