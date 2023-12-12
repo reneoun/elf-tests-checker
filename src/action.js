@@ -115,13 +115,13 @@ const createDiffTables = (covMap) => {
       tmpBodyRow.push(branchName);
       for (const covValue of objCovKeys2) {
         let value = covMap.get(branchName)[covName][covValue];
-        value =
-          typeof value === "number" ? String(value.toFixed(2)) ?? "0" : value;
         if (covValue === "valuePct") {
           value = Number(value) * 100;
           value = isNaN(value) ? "0" : value.toFixed(2);
           value = value + "%";
         }
+
+        value = typeof value === "number" ? String(value) ?? "0" : value;
         tmpBodyRow.push(value);
       }
       tmpBody.push(tmpBodyRow);
