@@ -37740,7 +37740,7 @@ const categoryDetails = new Map([
   [
     "Lines",
     [
-      0,
+      50,
       "This metric tells you the ratio of lines of code that are under test.",
     ],
   ],
@@ -37991,7 +37991,7 @@ const run = async () => {
       //TODO: Make Tresholds configurable in YAML
       let hasFailed =
         coveredPct < categoryPctTarget &&
-        ["Functions"].includes(category) &&
+        (["Functions"].includes(category) || ["Lines"].includes(category)) &&
         lastColRow > 1;
 
       coverageResults.push(!hasFailed);
